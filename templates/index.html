@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phylogenetic Tools</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <h1>Phylogenetic Tools</h1>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <button onclick="showTool('newick_tree_viewer', this)" class="active">Newick Tree Viewer</button>
+            <button onclick="showTool('sequence_alignment', this)">Sequence Alignment</button>
+            <button onclick="showTool('TAB3', this)">Tab 3</button>
+            <button onclick="showTool('TAB4', this)">Tab 4</button>
+        </div>
+
+        <!-- Main content -->
+        <div class="main">
+            <!-- newick_tree_viewer -->
+            <div id="newick_tree_viewer" class="tool active">
+                <h2>Newick Tree Viewer</h2>
+                <h4>Enter a Newick string to generate a visualization.</h4>
+                <form method="POST">
+                    <textarea 
+                        cols="50" 
+                        rows="5" 
+                        name="newick" 
+                        style="resize:vertical"  
+                        placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);"></textarea>
+                    <br>
+                    <button type="submit">Generate Tree</button>
+                </form>
+
+                {% if error %}
+                    <p style="color:red;">{{ error }}</p>
+                {% endif %}
+
+                {% if tree_image %}
+                    <img src="{{ tree_image }}">
+                {% endif %}
+            </div>
+
+            <div id="sequence_alignment" class="tool">
+                <h2>Sequence Alignment using MUSCLE</h2>
+                <h4>Enter your FASTA format sequences.</h4>
+
+            </div>
+
+            <div id="TAB3" class="tool">
+                <h2>Tab 3</h2>
+                <p>Coming soon.</p>
+            </div>
+
+            <div id="TAB4" class="tool">
+                <h2>Tab 4</h2>
+                <p>Coming soon.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTool(toolId, button) {
+            const tools = document.querySelectorAll('.tool');
+            tools.forEach(t => t.classList.remove('active'));
+
+            const buttons = document.querySelectorAll('.sidebar button');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            document.getElementById(toolId).classList.add('active');
+            if (button) button.classList.add('active');
+        }
+    </script>
+</body>
+</html>
