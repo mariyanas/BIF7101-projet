@@ -11,27 +11,39 @@
     <div class="container">
         <!-- Sidebar -->
         <div class="sidebar">
-            <button onclick="showTool('newick_tree_viewer', this)" class="active">Newick Tree Viewer</button>
-            <button onclick="showTool('sequence_alignment', this)">Sequence Alignment</button>
-            <button onclick="showTool('TAB3', this)">Tab 3</button>
-            <button onclick="showTool('TAB4', this)">Tab 4</button>
+            <button onclick="showTool('main-page', this)" class="{{ 'active' if active_tab == 'main-page' else '' }}">Main</button>
+            <p id="sidebar-text">Phylogenetic Methods</p>
+            <button onclick="showTool('bayesian-inference', this)" class="{{ 'active' if active_tab == 'bayesian-inference' else '' }}">Bayesian Inference</button>
+            <button onclick="showTool('TAB4', this)" class="{{ 'active' if active_tab == 'TAB4' else '' }}">Tab 4</button>
+            <p id="sidebar-text">Other Features</p>
+            <button onclick="showTool('newick_tree_viewer', this)" class="{{ 'active' if active_tab == 'newick_tree_viewer' else '' }}">Newick Tree Viewer</button>
+            <button onclick="showTool('sequence_alignment', this)" class="{{ 'active' if active_tab == 'sequence_alignment' else '' }}">Sequence Alignment</button>
+            <button onclick="showTool('conversion', this)" class="{{ 'active' if active_tab == 'conversion' else '' }}">Conversion</button>
         </div>
 
         <!-- Main content -->
         <div class="main">
+            <!-- Main Page -->
+            <div id="main-page" class="tool active">
+                <h2>Main Page</h2>
+                <p>Info ab site, libraries used ect. </p>
+            </div>
+
             <!-- newick_tree_viewer -->
-            <div id="newick_tree_viewer" class="tool active">
+            <div id="newick_tree_viewer" class="tool">
                 <h2>Newick Tree Viewer</h2>
                 <h4>Enter a Newick string to generate a visualization.</h4>
-                <form method="POST">
+                <form method="POST" action="/">
+                    <input type="hidden" name="active_tab" value="newick_tree_viewer">
                     <textarea 
                         cols="50" 
                         rows="5" 
                         name="newick" 
                         style="resize:vertical"  
-                        placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);"></textarea>
+                        placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);"
+                    >{{ request.form.get("newick", "") }}</textarea>
                     <br>
-                    <button type="submit">Generate Tree</button>
+                    <button type="submit">Submit</button>
                 </form>
 
                 {% if error %}
@@ -43,35 +55,110 @@
                 {% endif %}
             </div>
 
+            <!-- sequence alignment -->
             <div id="sequence_alignment" class="tool">
                 <h2>Sequence Alignment using MUSCLE</h2>
                 <h4>Enter your FASTA format sequences.</h4>
-
             </div>
 
-            <div id="TAB3" class="tool">
-                <h2>Tab 3</h2>
-                <p>Coming soon.</p>
+            <!-- bayesian inference -->
+            <div id="bayesian-inference" class="tool">
+                <h2>Bayesian Inference</h2>
+                <h3>Just getting my thoughts down. (Will delete!) </h3>
+                <p>
+                    Mr. Bayes takes in a NEXUS file (as apposed to a FASTA file), therefore we must inform the user to
+                    enter in the correct file type/ throw an error if they don't. (start w/ this)<br>
+                    Or we can allow a user to enter in an aligned fasta file and we can convert it w/in the function <br>
+                    The sequences must be aligned ie. the same length. (Again, inform user/ throw error if condition is not met). <br>
+                    1. Create a function that aligns sequences (using MUSCLE, MAFFT or both)<br>
+                    2. Create a function that converts to NEXUS from FASTA <br>
+                    3. On this page: 
+                </p>
+                <form method="POST" action="/bayesian_inference" enctype="multipart/form-data">
+                    <h4>Upload aligned sequences (FASTA or NEXUS):</h4>
+                    <input type="file" name="sequence_file" accept=".fasta,.fa,.txt,.nex" required>
+
+                    <h4>Parameters (leave blank for defaults):</h4>
+                    <label>Number of Generations: <input type="number" name="ngen" placeholder="Default: 1000000"></label><br><br>
+                    <label>Sample Frequency: <input type="number" name="samplefreq" placeholder="Default: 100"></label><br><br>
+                    <label>Print Frequency: <input type="number" name="printfreq" placeholder="Default: 100000"></label><br><br>
+                    <label>Number of burn-ins: <input type="number" name="burnin" placeholder="Default: 2500"></label><br><br>
+                    <button type="submit">Submit</button>
+                </form>
             </div>
 
             <div id="TAB4" class="tool">
                 <h2>Tab 4</h2>
                 <p>Coming soon.</p>
             </div>
+            
+            <!-- file conversions -->
+            <div id="conversion" class="tool">
+                <h2>Conversion from a FASTA file to a NEXUS file.</h2>
+                <!--
+                <form method="post" action="/convert">
+                    <p>Input FASTA file: </p> 
+                    <textarea 
+                        id="textarea-conversion" 
+                        name=fasta></textarea>
+                    <br>
+                    <button type="submit">Submit</button>
+                </form>
+                -->
+                <h3>Notes. Will delete!</h3>
+                <p>
+                    The current functionality of this page is limited to converting fasta files to nexus files 
+                    (the file type MrBayes takes in as input). (The functionality has been tested w/ our aligned fasta files from TP1) <br>
+                    We will eventually add other file conversions. And do more thorough testing including testing other types of molecules (RNA and proteins).
+                </p>
+                <form method="post" action="/convert" enctype="multipart/form-data">
+                    <h4>Upload FASTA file:</h4>
+                    <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
+
+                    <h4>Select molecule type:</h4>
+                    <label>
+                        <input type="radio" name="molecule_type" value="DNA" required> DNA
+                    </label>
+                    <label>
+                        <input type="radio" name="molecule_type" value="RNA"> RNA
+                    </label>
+                    <label>
+                        <input type="radio" name="molecule_type" value="protein"> Protein
+                    </label>
+                    <br><br>
+                    <button type="submit">Submit</button>
+                </form>
+
+                {% if error %}
+                    <p style="color:red;">{{ error }}</p>
+                {% endif %}
+
+                {% if nexus_output %}
+                    <h4>Converted NEXUS:</h4>
+                    <textarea cols="60" rows="10">{{ nexus_output }}</textarea>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <script>
-        function showTool(toolId, button) {
-            const tools = document.querySelectorAll('.tool');
-            tools.forEach(t => t.classList.remove('active'));
+<script>
+function showTool(toolId, button) {
+    const tools = document.querySelectorAll('.tool');
+    tools.forEach(t => t.classList.remove('active'));
+    const buttons = document.querySelectorAll('.sidebar button');
+    buttons.forEach(b => b.classList.remove('active'));
 
-            const buttons = document.querySelectorAll('.sidebar button');
-            buttons.forEach(b => b.classList.remove('active'));
+    document.getElementById(toolId).classList.add('active');
+    if (button) button.classList.add('active');
+}
 
-            document.getElementById(toolId).classList.add('active');
-            if (button) button.classList.add('active');
-        }
-    </script>
+window.onload = function() {
+    {% if active_tab %}
+    document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+    document.getElementById("{{ active_tab }}").classList.add('active');
+    {% endif %}
+};
+</script>
+    
 </body>
 </html>
