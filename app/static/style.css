@@ -29,6 +29,11 @@ h1 {
     gap: 10px;
 }
 
+.sidebar #sidebar-text {
+    color: white;
+    font-size: 18px;
+}
+
 .sidebar button {
     padding: 12px;
     background: #111827;
@@ -74,6 +79,20 @@ textarea {
     border: 1px solid #1e293b;
     border-radius: 8px;
     padding: 10px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+#textarea-conversion{
+    width: 60%;
+    height: 35px;
+    background: white;
+    color: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 10px;
+    resize: none;
+    font-size: 16px;
 }
 
 /* Button */
@@ -99,7 +118,7 @@ img {
 }
 
 /* textarea */
-textarea {
+/* textarea {
     width: 100%;
     box-sizing: border-box;
-}
+} */
