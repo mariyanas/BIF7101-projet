@@ -3,11 +3,18 @@ body {
     font-family: "Verdana", sans-serif;
     background: #f3f3f4;
     color: #0f172a;
+    height: 600px;
 }
 
-h1 {
+/* h1 {
     margin: 0;
     padding: 20px;
+} */
+
+.header {
+  position: sticky;
+  top: 0;
+  padding: 10px 16px;
     background: #020617;
     color:white;
 }
@@ -15,7 +22,7 @@ h1 {
 
 .container {
     display: flex;
-    height: 120vh; 
+    min-height: 100vh;
 }
 
 
