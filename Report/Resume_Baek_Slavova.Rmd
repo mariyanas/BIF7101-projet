@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Motivation et contexte
 
-Notre projet a pour but de développer un site web intuitif incluant de multiples outils d’analyse phylogénétique. Nous voulons créer une interface afin de faciliter l’accès à l’inférence d'arbres phylogénétiques, sans que les utilisateurs aient besoin de télécharger de nombreux algorithmes. Sur le plan personnel, ce projet nous permettra de nous familiariser avec plusieurs langages de programmation, dont Python, Javascript, CSS et HTML, en intégrant les connaissances acquises sur la phylogénie durant le cours BIF7101. Plus précisément, nous allons nous baser sur le serveur web T-REX, créé par Alix Boc, Alpha Boubacar Diallo et Vladimir Makarenkov, qui détermine l'inférence, la validation et la visualisation d'arbres et de réseaux phylogénétiques. Cette plateforme n’est plus maintenue, et plusieurs méthodes utilisées ont connu des mises à jour qui n’ont pas été reflétées sur le serveur web.
+Notre projet a pour but de développer un site web intuitif incluant de multiples outils d’analyse phylogénétique. Nous voulons créer une interface afin de faciliter l’accès à l’inférence d'arbres phylogénétiques, sans que les utilisateurs aient besoin de télécharger de nombreux algorithmes. Sur le plan personnel, ce projet nous permettra de nous familiariser avec plusieurs langages de programmation, dont Python, Javascript, CSS et HTML, en intégrant les connaissances acquises sur la phylogénie durant le cours BIF7101. Plus précisément, nous allons nous baser sur le serveur web T-REX, créé par Alix Boc, Alpha Boubacar Diallo et Vladimir Makarenkov, qui détermine l'inférence, la validation et la visualisation d'arbres et de réseaux phylogénétiques [@trex]. Cette plateforme n’est plus maintenue, et plusieurs méthodes utilisées ont connu des mises à jour qui n’ont pas été reflétées sur le serveur web.
 
 # Problématique 
 
@@ -31,25 +31,31 @@ Nous cherchons à combler des lacunes existantes dans les plateformes d’infér
 
 # Données et méthodes 
 
+Nous utiliserons des outils et des libraries déjà établis pour exécuter les méthodes phylogénétiques. Nous validerons nos résultats en vérifiant leur cohérence avec ce que nous avons appris en cours.
+
 Notre site utilise le framework Flask comme base. Nous avons divisé notre site en deux parties : les méthodes phylogénétiques et les autres outils.  
 
 ## Les méthodes phylogénétiques (Phylogenetic Methods)
 
-1. Inférence bayésienne: MrBayes: Nous allons donner à l’utilisateur la possibilité de saisir soit un fichier FASTA aligné, soit un fichier Nexus et l’option de choisir ses paramètres (ngen, samplefreq, printfreq et burnin).  
+1. Inférence bayésienne (MrBayes):   
+Nous allons donner à l’utilisateur la possibilité de saisir soit un fichier FASTA aligné, soit un fichier Nexus et l’option de choisir ses paramètres (ngen, samplefreq, printfreq et burnin). [@bayes]  
  
-2. Méthode de distance: Neighbor Joining   
+2. Méthode de distance (Bio Neighbor Joining):        
+Cet outil est une amélioration de l'algorithme classique NJ, puisqu'il permet de minimiser la variance des estimations de distances en construisant des topologies plus précises. [@bionj]
  
-3. Méthode de parcimonie: MPBoot  
+3. Méthode de parcimonie (MPBoot):       
+Cet outil implémente une version plus rapide du bootstrap pour l'inférence par maximum de parcimonie, en se basant sur les mécanismes de IQ-TREE (ces outils partagent les mêmes créateurs). Il permet d'obtenir des arbres robustes plus rapidement que les autres algorithmes par méthode de parcimonie (comme DNAPARS du groupe PHYLIP) [@mpboot]. Nous travaillons présentement sur comment l'implémenter à notre site web.
  
-4. Méthode maximum likelihood: IQ-TREE  
+4. Méthode maximum likelihood (IQ-TREE):    
+Pour cet outil, l'utilisateur n'aura pas besoin de choisir le modèle de substitution, car IQ-TREE permet la sélection automatique de celui-ci à l'aide de ModelFinder avant l'inférence de l'arbre. [@iqtree]
 
 ## Les autres outils (Other Tools)
 
-1. Viewer d’arbre Newick (Newick Tree Viewer):  
+1. Viewer d’arbre Newick (Newick Tree Viewer):   
 Nous utilisons le module Phylo fourni par le library biopython pour lire (read) l’arbre Newick saisi par un utilisateur. Nous utilisons aussi le library matplotlib pour nous aider à afficher une visualisation de l’arbre. Pour évaluer les résultats nous pouvons utiliser les connaissances acquises en classe pour vérifier les arbres.  
  
-2. Alignement de séquences (Sequence Alignment):  
-Nous allons utiliser les outils MAFFT et MUSCLE pour aligner les séquences. Nous voulons aussi rajouter l’outil Clustal Omega, qui est le successeur de ClustalW. T-REX utilise ClustalW, mais ClustalO permet un alignement plus rapide.  
+2. Alignement de séquences (Sequence Alignment):   
+Nous allons utiliser les outils MAFFT et MUSCLE pour aligner les séquences. Nous voulons aussi rajouter l’outil Clustal Omega [@clustalo], qui est le successeur de ClustalW. T-REX utilise ClustalW, mais ClustalO permet un alignement plus rapide. Avoir une telle diversité d'algorithmes d'alignement permet à l'utilisateur de choisir celui qui correspond le mieux à ses données.
  
 3. Conversion de fichiers (File Conversion):   
 Nous avons utilisé les modules Phylo et AlignIO de biopython.
