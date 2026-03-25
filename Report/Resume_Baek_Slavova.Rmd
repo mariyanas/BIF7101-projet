@@ -71,10 +71,10 @@ df <- data.frame(
   PhyloDendron = c('BioNJ', 'Clustalo', 'MPBoot', 'IQ-TREE'),
   TREX = c('NJ', 'Clustalw', 'DNAPARS', 'RAXML'),
   Comparaison = c(
-    "Distance RF", 
-    "Q-score (qualité de l'alignement)\nTemps de calcul pour 20 séquences de 30 000pb", 
-    "Score de parcimonie\nCPU total utilisé", 
-    "Score de vraisemblance\nTemps de convergence"))
+    "Distance RF - Longueur des branches", 
+    "Q-score (qualité de l'alignement) - Temps de calcul pour au moins 50 séquences (la longueur n'est pas encore choisie)", 
+    "Score de parcimonie - CPU total utilisé", 
+    "Score de vraisemblance - Temps de convergence"))
 
 panderOptions('table.split.table', Inf) 
 panderOptions('keep.line.breaks', TRUE) 
