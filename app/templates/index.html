@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Phylogenetic Tools</title>
+    <title>PhyloDendron</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <h1>Phylogenetic Tools</h1>
+    <div class="header" id="myHeader">
+        <h1>PhyloDendron</h1>
+    </div>
 
     <div class="container">
         <!-- Sidebar -->
@@ -14,7 +16,9 @@
             <button onclick="showTool('main-page', this)" class="{{ 'active' if active_tab == 'main-page' else '' }}">Main</button>
             <p id="sidebar-text">Phylogenetic Methods</p>
             <button onclick="showTool('bayesian-inference', this)" class="{{ 'active' if active_tab == 'bayesian-inference' else '' }}">Bayesian Inference</button>
-            <button onclick="showTool('TAB4', this)" class="{{ 'active' if active_tab == 'TAB4' else '' }}">Tab 4</button>
+            <button onclick="showTool('distance', this)" class="{{ 'active' if active_tab == 'distance' else '' }}">Distance Methods</button>
+            <button onclick="showTool('parsimony', this)" class="{{ 'active' if active_tab == 'parsimony' else '' }}">Parsimony</button>
+            <button onclick="showTool('maximum-liklihood', this)" class="{{ 'active' if active_tab == 'maximum-liklihood' else '' }}">Maximum Liklihood</button>
             <p id="sidebar-text">Other Features</p>
             <button onclick="showTool('newick_tree_viewer', this)" class="{{ 'active' if active_tab == 'newick_tree_viewer' else '' }}">Newick Tree Viewer</button>
             <button onclick="showTool('sequence_alignment', this)" class="{{ 'active' if active_tab == 'sequence_alignment' else '' }}">Sequence Alignment</button>
@@ -32,7 +36,7 @@
             <!-- newick_tree_viewer -->
             <div id="newick_tree_viewer" class="tool">
                 <h2>Newick Tree Viewer</h2>
-                <h4>Enter a Newick string to generate a visualization.</h4>
+                <h4>Enter a Newick string to generate a visualization.</h4>	
                 <form method="POST" action="/">
                     <input type="hidden" name="active_tab" value="newick_tree_viewer">
                     <textarea 
@@ -53,6 +57,17 @@
                 {% if tree_image %}
                     <img src="{{ tree_image }}">
                 {% endif %}
+
+                <br><br>
+                <p style="bottom: 0; left: 0; width: 100%;">
+                    <b>Citations: </b><br>
+                    <p style="font-size: 12px;">
+                        Eric Talevich, Brandon M. Invergo, Peter J.A. Cock, Brad A. Chapman: Bio.Phylo: A unified toolkit 
+                        for processing, analyzing and visualizing phylogenetic trees in Biopython. BMC Bioinformatics 13: 
+                        209 (2012). https://doi.org/10.1186/1471-2105-13-209
+                        <a href="https://doi.org/10.1186/1471-2105-13-209">https://doi.org/10.1186/1471-2105-13-209</a>
+                    </p>
+                </p>	
             </div>
 
             <!-- sequence alignment -->
@@ -64,16 +79,6 @@
             <!-- bayesian inference -->
             <div id="bayesian-inference" class="tool">
                 <h2>Bayesian Inference</h2>
-                <h3>Just getting my thoughts down. (Will delete!) </h3>
-                <p>
-                    Mr. Bayes takes in a NEXUS file (as apposed to a FASTA file), therefore we must inform the user to
-                    enter in the correct file type/ throw an error if they don't. (start w/ this)<br>
-                    Or we can allow a user to enter in an aligned fasta file and we can convert it w/in the function <br>
-                    The sequences must be aligned ie. the same length. (Again, inform user/ throw error if condition is not met). <br>
-                    1. Create a function that aligns sequences (using MUSCLE, MAFFT or both)<br>
-                    2. Create a function that converts to NEXUS from FASTA <br>
-                    3. On this page: 
-                </p>
                 <form method="POST" action="/bayesian_inference" enctype="multipart/form-data">
                     <h4>Upload aligned sequences (FASTA or NEXUS):</h4>
                     <input type="file" name="sequence_file" accept=".fasta,.fa,.txt,.nex" required>
@@ -85,26 +90,97 @@
                     <label>Number of burn-ins: <input type="number" name="burnin" placeholder="Default: 2500"></label><br><br>
                     <button type="submit">Submit</button>
                 </form>
+
+                {% if bayes_tree %}
+                    <img src="{{ bayes_tree }}">
+                {% endif %}
+
+                {% if log_file %}
+                    <a href="{{ log_file }}" download>Download MrBayes Log</a>
+                {% endif %}
+
+                {% if tree_image %}
+                    <h3>Consensus Tree</h3>
+                    <img src="{{ bayes_tree }}" width="600">
+                {% endif %}
+
+                <br><br>
+                <p style="bottom: 0; left: 0; width: 100%;">
+                    <b>Citations: </b><br>
+                    <p style="font-size: 12px;">
+                        Huelsenbeck, J.P., and F. Ronquist. 2001. MRBAYES: Bayesian inference of phylogeny. Bioinformatics 17:754-755.
+                        <br><br>
+                        Ronquist, F., and J.P. Huelsenbeck. 2003. MRBAYES 3: Bayesian phylogenetic inference under mixed models. Bioinformatics 19:1572-1574.
+                        <br><br>
+                        Ronquist, F., M. Teslenko, P. van der Mark, D.L. Ayres, A. Darling, S. Höhna, B. Larget, L. Liu, M.A. Suchard, and J.P. Huelsenbeck. 
+                        2012. MRBAYES 3.2: Efficient Bayesian phylogenetic inference and model selection across a large model space. Syst. Biol. 61:539-542.
+                        <br><br>
+                        Altekar, G., S. Dwarkadas, J. P. Huelsenbeck, and F. Ronquist. 2004. Parallel Metropolis-coupled Markov chain 
+                        Monte Carlo for Bayesian phylogenetic inference. Bioinformatics 20:407-415.
+                    </p>
+                </p>
+
             </div>
 
-            <div id="TAB4" class="tool">
-                <h2>Tab 4</h2>
+            <!-- distance methods -->
+            <div id="distance" class="tool">
+                <h2>Distance Methods</h2>
+                <p>
+                To construct a tree, both UPGMA and NJ will use IQ-TREE to use select 
+                the best evolutionary model and calculate the phylogenetic distance matrix.
+                </p>
+                <form method="post" action="/distance-methods" enctype="multipart/form-data">
+                    <h3>UPGMA (Unweighted Pair Group Method with Arithmetic Mean)</h3>
+                    <h4>Upload aligned sequences (FASTA format)</h4>
+                    <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
+                    <br><br>
+                    <button type="submit">Submit</button>
+                    <br><br><br><br><br>
+                    <h3>NJ (Neighbor Joining)</h3>
+                    <h4>Upload aligned sequences (FASTA format)</h4>
+                    <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
+                    <br><br>
+                    <button type="submit">Submit</button>
+                </form>
+                
+                <br><br>
+                <p style="bottom: 0; left: 0; width: 100%;">
+                    <b>Citations: </b><br>
+                    <p style="font-size: 12px;">
+                        Thomas K.F. Wong, Nhan Ly-Trong, Huaiyan Ren, Hector Banos, Andrew J. Roger, 
+                        Edward Susko, Chris Bielow, Nicola De Maio, Nick Goldman, Matthew W. Hahn, 
+                        Gavin Huttley, Robert Lanfear, Bui Quang Minh (2025) IQ-TREE 3: Phylogenomic 
+                        Inference Software using Complex Evolutionary Models. Submitted. 
+                        <a href="https://ecoevorxiv.org/repository/view/8916/">https://ecoevorxiv.org/repository/view/8916/</a>
+                        <br><br>
+                        Peter J. A. Cock, Tiago Antao, Jeffrey T. Chang, Brad A. Chapman, Cymon J. Cox, Andrew Dalke, Iddo Friedberg, 
+                        Thomas Hamelryck, Frank Kauff, Bartek Wilczyński, Michiel J. L. de Hoon: Biopython: freely available Python 
+                        tools for computational molecular biology and bioinformatics. Bioinformatics 25 (11), 1422–1423 (2009). 
+                        <a href="https://doi.org/10.1093/bioinformatics/btp163">https://doi.org/10.1093/bioinformatics/btp163</a>
+                        <br><br>
+                        Eric Talevich, Brandon M. Invergo, Peter J.A. Cock, Brad A. Chapman: Bio.Phylo: A unified toolkit 
+                        for processing, analyzing and visualizing phylogenetic trees in Biopython. BMC Bioinformatics 13: 
+                        209 (2012). https://doi.org/10.1186/1471-2105-13-209
+                        <a href="https://doi.org/10.1186/1471-2105-13-209">https://doi.org/10.1186/1471-2105-13-209</a>
+                    </p>
+                </p>	
+            </div>
+
+            <!-- parsimony -->
+            <div id="parsimony" class="tool">
+                <h2>Parsimony </h2>
+                <p>Coming soon.</p>
+            </div>
+
+            <!-- Maximum Liklihood -->
+            <div id="maximum-liklihood" class="tool">
+                <h2>Maximum Liklihood </h2>
                 <p>Coming soon.</p>
             </div>
             
             <!-- file conversions -->
             <div id="conversion" class="tool">
                 <h2>Conversion from a FASTA file to a NEXUS file.</h2>
-                <!--
-                <form method="post" action="/convert">
-                    <p>Input FASTA file: </p> 
-                    <textarea 
-                        id="textarea-conversion" 
-                        name=fasta></textarea>
-                    <br>
-                    <button type="submit">Submit</button>
-                </form>
-                -->
                 <h3>Notes. Will delete!</h3>
                 <p>
                     The current functionality of this page is limited to converting fasta files to nexus files 
@@ -137,28 +213,29 @@
                     <h4>Converted NEXUS:</h4>
                     <textarea cols="60" rows="10">{{ nexus_output }}</textarea>
                 {% endif %}
+                
+                <br><br>
+                <p style="bottom: 0; left: 0; width: 100%;">
+                    <b>Citations: </b><br>
+                    <p style="font-size: 12px;">
+                        Peter J. A. Cock, Tiago Antao, Jeffrey T. Chang, Brad A. Chapman, Cymon J. Cox, Andrew Dalke, Iddo Friedberg, 
+                        Thomas Hamelryck, Frank Kauff, Bartek Wilczyński, Michiel J. L. de Hoon: Biopython: freely available Python 
+                        tools for computational molecular biology and bioinformatics. Bioinformatics 25 (11), 1422–1423 (2009). 
+                        <a href="https://doi.org/10.1093/bioinformatics/btp163">https://doi.org/10.1093/bioinformatics/btp163</a>
+                    </p>
+                </p>
             </div>
         </div>
     </div>
+</body>
 
-<script>
-function showTool(toolId, button) {
-    const tools = document.querySelectorAll('.tool');
-    tools.forEach(t => t.classList.remove('active'));
-    const buttons = document.querySelectorAll('.sidebar button');
-    buttons.forEach(b => b.classList.remove('active'));
-
-    document.getElementById(toolId).classList.add('active');
-    if (button) button.classList.add('active');
-}
-
-window.onload = function() {
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>window.onload = function() {
     {% if active_tab %}
     document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
     document.getElementById("{{ active_tab }}").classList.add('active');
     {% endif %}
 };
 </script>
-    
-</body>
+
 </html>
