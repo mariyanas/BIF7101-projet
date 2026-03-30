@@ -82,6 +82,3 @@ def convert():
             "index.html",
             error=f"Conversion failed: {str(e)}"
         )
-
-if __name__ == "__main__":
-    app.run(debug=True)
