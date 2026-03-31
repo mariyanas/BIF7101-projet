@@ -1,59 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>PhyloDendron</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p1...yourhash..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-
 <body>
-    <div class="header" id="myHeader">
-        <h1>PhyloDendron</h1>
-    </div>
 
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <button onclick="showTool('main-page', this)" class="{{ 'active' if active_tab == 'main-page' else '' }}">Main</button>
-            <p id="sidebar-text">Phylogenetic Methods</p>
-            <button onclick="showTool('bayesian-inference', this)" class="{{ 'active' if active_tab == 'bayesian-inference' else '' }}">Bayesian Inference</button>
-            <button onclick="showTool('distance', this)" class="{{ 'active' if active_tab == 'distance' else '' }}">Distance Methods</button>
-            <button onclick="showTool('parsimony', this)" class="{{ 'active' if active_tab == 'parsimony' else '' }}">Parsimony</button>
-            <button onclick="showTool('maximum-liklihood', this)" class="{{ 'active' if active_tab == 'maximum-liklihood' else '' }}">Maximum Liklihood</button>
-            <p id="sidebar-text">Other Features</p>
-            <button onclick="showTool('newick_tree_viewer', this)" class="{{ 'active' if active_tab == 'newick_tree_viewer' else '' }}">Newick Tree Viewer</button>
-            <button onclick="showTool('sequence_alignment', this)" class="{{ 'active' if active_tab == 'sequence_alignment' else '' }}">Sequence Alignment</button>
-            <button onclick="showTool('conversion', this)" class="{{ 'active' if active_tab == 'conversion' else '' }}">Conversion</button>
+    <!-- NAVBAR -->
+    <div class="topnav">
+        <button onclick="showTool('main-page', this)" class="{{ 'active' if active_tab == 'main-page' else '' }}">PhyloDendron <i class="fa-brands fa-pagelines"></i></button>
+
+        <div class="dropdown">
+            <button class="dropbtn">Tree Inference</button>
+            <div class="dropdown-content">
+                <button onclick="showTool('bayesian-inference', this)" class="{{ 'active' if active_tab == 'bayesian-inference' else '' }}">Bayesian Inference</button>
+                <button onclick="showTool('parsimony', this)" class="{{ 'active' if active_tab == 'parsimony' else '' }}">Parsimony</button>
+                <button onclick="showTool('maximum-likelihood', this)" class="{{ 'active' if active_tab == 'maximum-likelihood' else '' }}">Maximum Likelihood</button>
+                <button onclick="showTool('distance', this)" class="{{ 'active' if active_tab == 'sequence_alignment' else '' }}">Distance Methods</button>
+            </div>
         </div>
 
-        <!-- Main content -->
+        <div class="dropdown">
+            <button class="dropbtn">Sequence Alignment</button>
+            <div class="dropdown-content">
+                <button onclick="showTool('sequence_alignment1', this)" class="{{ 'active' if active_tab == 'dis1' else '' }}">MUSCLE</button>
+                <button onclick="showTool('sequence_alignment2', this)" class="{{ 'active' if active_tab == 'dis2' else '' }}">MAFFT</button>
+                <button onclick="showTool('sequence_alignment3', this)" class="{{ 'active' if active_tab == 'dis2' else '' }}">ClustalW</button>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">Other Tools</button>
+            <div class="dropdown-content">
+                <button onclick="showTool('newick_tree_viewer', this)" class="{{ 'active' if active_tab == 'newick_tree_viewer' else '' }}">Newick Tree Viewer</button>
+                <button onclick="showTool('conversion', this)" class="{{ 'active' if active_tab == 'conversion' else '' }}">Conversion</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
         <div class="main">
+            
             <!-- Main Page -->
             <div id="main-page" class="tool active">
-                <h2>Main Page</h2>
-                <p>Info ab site, libraries used ect. </p>
+                <h2>PhyloDendron</h2>
+                <p>info</p>
+                <br>
+                <h2>Phylogenetic Methods</h2>
+                <h3>Bayesian Inference</h3>
+                <h3>Parsimony</h3>
+                <h3>Maximum Likelihood</h3>
+                <h3>Distance Methods</h3>
+                <br>
+                <h2>Sequence Alignment</h2>
+                <br>
+                <h2>Other Tools</h2>
+                <h3>Newick Tree viewer</h3>
+                <h3>Sequence Alignment</h3>
+                <h3>Conversion</h3>
             </div>
 
-            <!-- newick_tree_viewer -->
+            <!-- Newick Tree Viewer -->
             <div id="newick_tree_viewer" class="tool">
                 <h2>Newick Tree Viewer</h2>
-                <h4>Enter a Newick string to generate a visualization.</h4>	
+                <h4>Enter a Newick string to generate a visualization.</h4>
                 <form method="POST" action="/">
                     <input type="hidden" name="active_tab" value="newick_tree_viewer">
-                    <textarea 
-                        cols="50" 
-                        rows="5" 
-                        name="newick" 
-                        style="resize:vertical"  
-                        placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);"
-                    >{{ request.form.get("newick", "") }}</textarea>
+                    <textarea name="newick" cols="50" rows="5" style="resize:vertical;" placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);">{{ request.form.get("newick", "") }}</textarea>
                     <br>
                     <button type="submit">Submit</button>
                 </form>
-
                 {% if error %}
                     <p style="color:red;">{{ error }}</p>
                 {% endif %}
-
                 {% if tree_image %}
                     <img src="{{ tree_image }}">
                 {% endif %}
@@ -67,22 +89,24 @@
                         209 (2012). https://doi.org/10.1186/1471-2105-13-209
                         <a href="https://doi.org/10.1186/1471-2105-13-209">https://doi.org/10.1186/1471-2105-13-209</a>
                     </p>
-                </p>	
+                </p>
             </div>
 
-            <!-- sequence alignment -->
+            <!-- Sequence Alignment -->
             <div id="sequence_alignment" class="tool">
                 <h2>Sequence Alignment using MUSCLE</h2>
                 <h4>Enter your FASTA format sequences.</h4>
+
+                <h2>Sequence Alignment using MAFFT</h2>
+                <h4>Enter your FASTA format sequences.</h4>
             </div>
 
-            <!-- bayesian inference -->
+            <!-- Bayesian Inference -->
             <div id="bayesian-inference" class="tool">
                 <h2>Bayesian Inference</h2>
                 <form method="POST" action="/bayesian_inference" enctype="multipart/form-data">
                     <h4>Upload aligned sequences (FASTA or NEXUS):</h4>
                     <input type="file" name="sequence_file" accept=".fasta,.fa,.txt,.nex" required>
-
                     <h4>Parameters (leave blank for defaults):</h4>
                     <label>Number of Generations: <input type="number" name="ngen" placeholder="Default: 1000000"></label><br><br>
                     <label>Sample Frequency: <input type="number" name="samplefreq" placeholder="Default: 100"></label><br><br>
@@ -119,10 +143,9 @@
                         Monte Carlo for Bayesian phylogenetic inference. Bioinformatics 20:407-415.
                     </p>
                 </p>
-
             </div>
 
-            <!-- distance methods -->
+            <!-- Distance Methods -->
             <div id="distance" class="tool">
                 <h2>Distance Methods</h2>
                 <p>
@@ -130,15 +153,17 @@
                 the best evolutionary model and calculate the phylogenetic distance matrix.
                 </p>
                 <form method="post" action="/distance-methods" enctype="multipart/form-data">
-                    <h3>UPGMA (Unweighted Pair Group Method with Arithmetic Mean)</h3>
+                    <h2>Unweighted Pair Group Method with Arithmetic Mean (UPGMA)</h2>
                     <h4>Upload aligned sequences (FASTA format)</h4>
-                    <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
+                    <input type="file" name="fasta_file_upgma" accept=".fasta,.fa,.txt" required>
                     <br><br>
                     <button type="submit">Submit</button>
-                    <br><br><br><br><br>
-                    <h3>NJ (Neighbor Joining)</h3>
+                </form>
+                <br><br><hr><br><br>
+                <form method="post" action="/NJ" enctype="multipart/form-data">
+                    <h2>Neighbor-Joining (NJ)</h2>
                     <h4>Upload aligned sequences (FASTA format)</h4>
-                    <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
+                    <input type="file" name="fasta_file_nj" accept=".fasta,.fa,.txt" required>
                     <br><br>
                     <button type="submit">Submit</button>
                 </form>
@@ -163,30 +188,24 @@
                         209 (2012). https://doi.org/10.1186/1471-2105-13-209
                         <a href="https://doi.org/10.1186/1471-2105-13-209">https://doi.org/10.1186/1471-2105-13-209</a>
                     </p>
-                </p>	
-            </div>
-
-            <!-- parsimony -->
-            <div id="parsimony" class="tool">
-                <h2>Parsimony </h2>
-                <p>Coming soon.</p>
-            </div>
-
-            <!-- Maximum Liklihood -->
-            <div id="maximum-liklihood" class="tool">
-                <h2>Maximum Liklihood </h2>
-                <p>Coming soon.</p>
-            </div>
-            
-            <!-- file conversions -->
-            <div id="conversion" class="tool">
-                <h2>Conversion from a FASTA file to a NEXUS file.</h2>
-                <h3>Notes. Will delete!</h3>
-                <p>
-                    The current functionality of this page is limited to converting fasta files to nexus files 
-                    (the file type MrBayes takes in as input). (The functionality has been tested w/ our aligned fasta files from TP1) <br>
-                    We will eventually add other file conversions. And do more thorough testing including testing other types of molecules (RNA and proteins).
                 </p>
+            </div>
+
+            <!-- Parsimony -->
+            <div id="parsimony" class="tool">
+                <h2>Parsimony</h2>
+                <p>Coming soon.</p>
+            </div>
+
+            <!-- Maximum Likelihood -->
+            <div id="maximum-likelihood" class="tool">
+                <h2>Maximum Likelihood</h2>
+                <p>Coming soon.</p>
+            </div>
+
+            <!-- File Conversion -->
+            <div id="conversion" class="tool">
+                <h2>Convert a FASTA file to a NEXUS file</h2>
                 <form method="post" action="/convert" enctype="multipart/form-data">
                     <h4>Upload FASTA file:</h4>
                     <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
@@ -202,7 +221,7 @@
                         <input type="radio" name="molecule_type" value="protein"> Protein
                     </label>
                     <br><br>
-                    <button type="submit">Submit</button>
+                    <button type="submit">Download</button>
                 </form>
 
                 {% if error %}
@@ -227,10 +246,10 @@
             </div>
         </div>
     </div>
-</body>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-<script>window.onload = function() {
+<script>
+window.onload = function() {
     {% if active_tab %}
     document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
     document.getElementById("{{ active_tab }}").classList.add('active');
@@ -238,4 +257,5 @@
 };
 </script>
 
+</body>
 </html>
