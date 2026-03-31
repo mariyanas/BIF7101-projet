@@ -1,10 +1,10 @@
-function showTool(toolId, button) {
-    const tools = document.querySelectorAll('.tool');
-    tools.forEach(t => t.classList.remove('active'));
-    const buttons = document.querySelectorAll('.sidebar button');
-    buttons.forEach(b => b.classList.remove('active'));
+function showTool(toolId, btn) {
+
+    document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
 
     document.getElementById(toolId).classList.add('active');
-    if (button) button.classList.add('active');
-}
 
+    document.querySelectorAll('.topnav button, .dropdown-content button').forEach(b => b.classList.remove('active'));
+
+    btn.classList.add('active');
+}
