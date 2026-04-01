@@ -1,0 +1,61 @@
+---
+title:    | 
+    | **Rapport du projet de session**
+    |
+    | **PhyloDendron - Création d’un site web d’inférence d’arbres phylogénétiques**
+author:    |
+    | Session Hiver 2026
+    | Date de remise : 06 mai 2026 à 23h59
+    | Enseignant : Dylan Lebatteux
+date: "Chelsea Baek et Mariyana Slavova"
+output:
+  bookdown::pdf_document2:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    fig_caption: true
+bibliography: references.bib 
+csl: vancouver.csl
+link-citations: true
+toc-title: "Table des matières"
+---
+
+# Résumé
+
+# Introduction et problématique 
+
+# Méthodes et matériel 
+
+## Les données utilisées 
+
+## Les algorithmes, outils et logiciels 
+
+### Phylogénétique
+
+### Informatique
+
+- [Flask](https://flask.palletsprojects.com/en/stable/)
+- [name.com](https://www.name.com)
+- [DigitalOcean](https://www.digitalocean.com)
+
+## Le protocole 
+
+# Résultats et discussion 
+
+## Les résultats 
+
+## Analyse et interprétation des résultats
+
+## Les forces et les limites 
+
+## Comparison
+
+# Conclusion 
+
+# Références 
+
+<!-- Chaque référence doit être citée au moins une fois dans le texte  -->
+
+---
+nocite: '@*'
+...
