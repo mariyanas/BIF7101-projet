@@ -40,7 +40,6 @@
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="container">
         <div class="main">
             
@@ -66,15 +65,21 @@
             <!-- Newick Tree Viewer -->
             <div id="newick_tree_viewer" class="tool">
                 <h2>Newick Tree Viewer</h2>
-                <h4>Enter a Newick string to generate a visualization.</h4>
+
                 <form method="POST" action="/">
+                    <h4>Enter a Newick string to generate a visualization.</h4>
                     <input type="hidden" name="active_tab" value="newick_tree_viewer">
                     <textarea name="newick" cols="50" rows="5" style="resize:vertical;" placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);">{{ request.form.get("newick", "") }}</textarea>
+                    <h4>Width (inches)</h4>
+                    <input type="number" step="0.2" name="width" placeholder="6.4" style="width: 10%;">
+                    <h4>Height (inches)</h4>
+                    <input type="number" step="0.2" name="height" placeholder="4.8" style="width: 10%;">
                     <br>
                     <button type="submit">Submit</button>
                 </form>
-                {% if error %}
-                    <p style="color:red;">{{ error }}</p>
+
+                {% if tree_error %}
+                    <p style="color:red;">{{ tree_error }}</p>
                 {% endif %}
                 {% if tree_image %}
                     <img src="{{ tree_image }}">
@@ -104,14 +109,14 @@
             <!-- Bayesian Inference -->
             <div id="bayesian-inference" class="tool">
                 <h2>Bayesian Inference</h2>
-                <form method="POST" action="/bayesian_inference" enctype="multipart/form-data">
+                <form id="bayesian-inference-form" method="POST" action="/bayesian_inference" enctype="multipart/form-data">
                     <h4>Upload aligned sequences (FASTA or NEXUS):</h4>
                     <input type="file" name="sequence_file" accept=".fasta,.fa,.txt,.nex" required>
                     <h4>Parameters (leave blank for defaults):</h4>
-                    <label>Number of Generations: <input type="number" name="ngen" placeholder="Default: 1000000"></label><br><br>
-                    <label>Sample Frequency: <input type="number" name="samplefreq" placeholder="Default: 100"></label><br><br>
-                    <label>Print Frequency: <input type="number" name="printfreq" placeholder="Default: 100000"></label><br><br>
-                    <label>Number of burn-ins: <input type="number" name="burnin" placeholder="Default: 2500"></label><br><br>
+                    <label>Number of Generations: <br><input type="number" name="ngen" placeholder="Default: 1000000" style="width: 10%;"></label><br><br>
+                    <label>Sample Frequency: <br><input type="number" name="samplefreq" placeholder="Default: 100" style="width: 10%;"></label><br><br>
+                    <label>Print Frequency: <br><input type="number" name="printfreq" placeholder="Default: 100000" style="width: 10%;"></label><br><br>
+                    <label>Number of burn-ins: <br><input type="number" name="burnin" placeholder="Default: 2500" style="width: 10%;"></label><br><br>
                     <button type="submit">Submit</button>
                 </form>
 
@@ -146,13 +151,21 @@
             </div>
 
             <!-- Distance Methods -->
+            <div id="loading-overlay" style="display:none;">
+            <div class="loader">
+                <div class="spinner spinner1"></div>
+                <div class="spinner spinner2"></div>
+                <div class="spinner spinner3"></div>
+            </div>
+            </div>
             <div id="distance" class="tool">
                 <h2>Distance Methods</h2>
                 <p>
                 To construct a tree, both UPGMA and NJ will use IQ-TREE to use select 
                 the best evolutionary model and calculate the phylogenetic distance matrix.
                 </p>
-                <form method="post" action="/distance-methods" enctype="multipart/form-data">
+                <!--
+                <form id="upgma-form" method="post" action="/distance-methods" enctype="multipart/form-data">
                     <h2>Unweighted Pair Group Method with Arithmetic Mean (UPGMA)</h2>
                     <h4>Upload aligned sequences (FASTA format)</h4>
                     <input type="file" name="fasta_file_upgma" accept=".fasta,.fa,.txt" required>
@@ -160,14 +173,32 @@
                     <button type="submit">Submit</button>
                 </form>
                 <br><br><hr><br><br>
-                <form method="post" action="/NJ" enctype="multipart/form-data">
+                <form id="nj-form" method="post" action="/NJ" enctype="multipart/form-data">
                     <h2>Neighbor-Joining (NJ)</h2>
                     <h4>Upload aligned sequences (FASTA format)</h4>
                     <input type="file" name="fasta_file_nj" accept=".fasta,.fa,.txt" required>
                     <br><br>
                     <button type="submit">Submit</button>
                 </form>
-                
+                -->
+                <form id = "distance-form" method="post" action="/distance-methods" enctype="multipart/form-data">
+                    <h4>Upload aligned sequences (FASTA format)</h4>
+                    <input type="file" name="fasta_file_distance" accept=".fasta,.fa,.txt" required>
+                    <br><br>
+                    <h4 for="method">Select method:</h4>
+                    <input type="radio" id="nj" name="method" value="nj" required>
+                    <label for="nj">NJ (Neighbor-Joining)</label>
+                    <input type="radio" id="upgma" name="method" value="upgma">
+                    <label for="upgma">UPGMA (Unweighted Pair Group Method with Arithmetic Mean)</label>
+                    <br><br>
+                    <button type="submit">Submit</button>
+                </form>
+                {% if distance_error %}
+                    <p style="color:red;">{{ distance_error }}</p>
+                {% endif %}
+                {% if tree_image_distance %}
+                    <img src="{{ tree_image_distance }}">
+                {% endif %}
                 <br><br>
                 <p style="bottom: 0; left: 0; width: 100%;">
                     <b>Citations: </b><br>
@@ -254,6 +285,27 @@ window.onload = function() {
     document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
     document.getElementById("{{ active_tab }}").classList.add('active');
     {% endif %}
+};
+
+window.onload = function() {
+    {% if active_tab %}
+    document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+    document.getElementById("{{ active_tab }}").classList.add('active');
+    {% endif %}
+
+    var distanceForm = document.querySelector("#distance-form");
+    if (distanceForm) {
+        distanceForm.addEventListener("submit", function() {
+            document.getElementById("loading-overlay").style.display = "flex";
+        });
+    }
+
+    var bayesianInferenceForm = document.querySelector("#bayesian-inference-form");
+    if (bayesianInferenceForm) {
+        bayesianInferenceForm.addEventListener("submit", function() {
+            document.getElementById("loading-overlay").style.display = "flex";
+        });
+    }
 };
 </script>
 
