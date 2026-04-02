@@ -69,7 +69,7 @@
                 <form method="POST" action="/">
                     <h4>Enter a Newick string to generate a visualization.</h4>
                     <input type="hidden" name="active_tab" value="newick_tree_viewer">
-                    <textarea name="newick" cols="50" rows="5" style="resize:vertical;" placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);">{{ request.form.get("newick", "") }}</textarea>
+                    <textarea name="newick" cols="50" rows="5" style="resize:vertical;" placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);"></textarea>
                     <h4>Width (inches)</h4>
                     <input type="number" step="0.2" name="width" placeholder="6.4" style="width: 10%;">
                     <h4>Height (inches)</h4>
