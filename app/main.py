@@ -150,7 +150,7 @@ def NJ():
             "iqtree3",
             "-s", filepath,
             "-m", "MFP",
-            "-nt", "AUTO",
+            "-nt", "1",
             "-redo"
         ]     
         # print("Running command:", " ".join(cmd))
@@ -195,7 +195,7 @@ def NJ():
             "iqtree3",
             "-s", filepath,
             "-m", best_model,
-            "-nt", "AUTO",
+            "-nt", "1",
             "-redo", 
             "-pre", os.path.join(os.path.dirname(filepath), prefix)
         ]
