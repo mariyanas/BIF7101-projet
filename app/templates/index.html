@@ -33,9 +33,9 @@
         <div class="dropdown">
             <button class="dropbtn">Sequence Alignment</button>
             <div class="dropdown-content">
-                <button onclick="showTool('sequence_alignment1', this)" class="{{ 'active' if active_tab == 'dis1' else '' }}">MUSCLE</button>
-                <button onclick="showTool('sequence_alignment2', this)" class="{{ 'active' if active_tab == 'dis2' else '' }}">MAFFT</button>
-                <button onclick="showTool('sequence_alignment3', this)" class="{{ 'active' if active_tab == 'dis2' else '' }}">ClustalW</button>
+                <button onclick="showTool('muscle', this)" class="{{ 'active' if active_tab == 'muscle' else '' }}">MUSCLE</button>
+                <button onclick="showTool('mafft', this)" class="{{ 'active' if active_tab == 'mafft' else '' }}">MAFFT</button>
+                <button onclick="showTool('clustalo', this)" class="{{ 'active' if active_tab == 'clustalo' else '' }}">ClustalOmega</button>
             </div>
         </div>
 
@@ -63,6 +63,9 @@
                 <h3>Distance Methods</h3>
                 <br>
                 <h2>Sequence Alignment</h2>
+                <h3>MUSCLE</h3>
+                <h3>MAFFT</h3>
+                <h3>Clustal Omega</h3>
                 <br>
                 <h2>Other Tools</h2>
                 <h3>Newick Tree viewer</h3>
@@ -107,6 +110,77 @@
             </div>
 
             <!-- Sequence Alignment -->
+            <!-- sequence alignment/MUSCLE -->
+            <div id="muscle" class="tool">
+                <h2>Sequence Alignment using MUSCLE v5</h2>
+                <form id="muscle-form" method="POST" action="/align_muscle" enctype="multipart/form-data">
+                    <input type="hidden" name="active_tab" value="muscle">
+                    <h4>Upload unaligned sequences (FASTA format):</h4>
+                    <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
+                    <br><br>
+                    <h4>Computation Mode:</h4>
+                    <select name="computation_mode" style="padding: 5px;">
+                        <option value="align">Standard (-align): High accuracy</option>
+                        <option value="super5">Super5 (-super5): Large datasets</option>
+                    </select>
+                    <br><br>
+                    <button type="submit">Run Alignment</button>
+                </form>
+
+                {% if error and active_tab == 'muscle' %}
+                    <p style="color:red;">{{ error }}</p>
+                {% endif %}
+                
+                <br><br>
+                <p>
+                    <b>Citations: </b><br>
+                    <span style="font-size: 12px;">
+                        Edgar, R.C. (2022) MUSCLE v5. 
+                        <a href="https://doi.org/10.1101/2021.06.20.449169">https://doi.org/10.1101/2021.06.20.449169</a>
+                    </span>
+                </p>
+            </div>
+             
+
+            <!-- sequence alignment/MAFFT -->
+            <div id="mafft" class="tool">
+                <h2>Sequence Alignment using MAFFT</h2>
+                <form method="POST" action="/align_mafft" enctype="multipart/form-data">
+                    <input type="hidden" name="active_tab" value="mafft">
+                    <h4>Enter your FASTA format sequences.</h4>
+                    <input type="file" name="fasta_file" required>
+                    <br><br>
+                    <div class="options-group">
+                        <label for="mafft_strategy">Alignment Strategy:</label>
+                        <select name="mafft_strategy" id="mafft_strategy">
+                            <option value="--auto">Auto (Default speed/accuracy)</option>
+                            <option value="--linsi">L-INS-i (Most accurate, max ~200 sequences)</option>
+                            <option value="--einsi">E-INS-i (For sequences with large gaps)</option>
+                            <option value="--ginsi">G-INS-i (For sequences of similar length)</option>
+                        </select>
+                    </div>
+                    <br><br>
+                    <!-- <p style="font-size: 14px; color: #666;">Mode: --auto (Automatically selects strategy based on data size)</p> -->
+                    <button type="submit">Run MAFFT Alignment</button>
+                </form>
+            </div>
+
+            <!-- sequence alignment/CLUSTALO -->
+            <div id="clustalo" class="tool">
+                <h2>Sequence Alignment (Clustal Omega)</h2>
+                <form method="POST" action="/align_clustalo" enctype="multipart/form-data">
+                    <input type="hidden" name="active_tab" value="clustalo">
+                    <h4>Upload Sequences (FASTA format):</h4>
+                    <input type="file" name="fasta_file" required>
+                    <br><br>
+                    <p style="font-size: 14px; color: #666;">
+                        Clustal Omega uses seeded guide trees and HMM profile-profile techniques to provide high-scale alignments.
+                    </p>
+                    <button type="submit">Run Clustal Omega</button>
+                </form>
+            </div>
+
+            <!--
             <div id="sequence_alignment" class="tool">
                 <h2>Sequence Alignment using MUSCLE</h2>
                 <h4>Enter your FASTA format sequences.</h4>
@@ -114,6 +188,7 @@
                 <h2>Sequence Alignment using MAFFT</h2>
                 <h4>Enter your FASTA format sequences.</h4>
             </div>
+            -->
 
             <!-- Bayesian Inference -->
             <div id="bayesian-inference" class="tool">
@@ -226,15 +301,45 @@
 
             <!-- Parsimony -->
             <div id="parsimony" class="tool">
+                <h2>Maximum Parsimony (MPBoot)</h2>
+                <p>Construct phylogenetic trees using fast maximum parsimony with 1000 bootstrap replicates.</p>
+                
+                <form method="POST" action="/run_mpboot" enctype="multipart/form-data">
+                    <input type="hidden" name="active_tab" value="parsimony">
+                    <h4>Upload Aligned Sequences (FASTA):</h4>
+                    <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
+                    <br><br>
+                    <button type="submit" style="background-color: #4f46e5; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                        Generate Parsimony Tree
+                    </button>
+                </form>
+            </div>
+            <!--
+            <div id="parsimony" class="tool">
                 <h2>Parsimony</h2>
                 <p>Coming soon.</p>
             </div>
+             -->
 
             <!-- Maximum Likelihood -->
+            <div id="maximum-likelihood" class="tool">
+                <h2>Maximum Likelihood (IQ-TREE)</h2>
+                <p>IQ-TREE uses ModelFinder to pick the best substitution model and builds an ML tree.</p>
+                
+                <form onsubmit="handleAnalysis(event, '/run_iqtree')">
+                    <h4>Upload Aligned Sequences (FASTA):</h4>
+                    <input type="file" name="alignment_file" required>
+                    <br><br>
+                    <button type="submit">Run IQ-TREE</button>
+                </form>
+            </div>
+            
+            <!--
             <div id="maximum-likelihood" class="tool">
                 <h2>Maximum Likelihood</h2>
                 <p>Coming soon.</p>
             </div>
+            -->
 
             <!-- File Conversion -->
             <div id="conversion" class="tool">
@@ -298,6 +403,13 @@ window.onload = function() {
     var bayesianInferenceForm = document.querySelector("#bayesian-inference-form");
     if (bayesianInferenceForm) {
         bayesianInferenceForm.addEventListener("submit", function() {
+            document.getElementById("loading-overlay").style.display = "flex";
+        });
+    }
+
+    var muscleForm = document.querySelector("#muscle-form");
+    if (muscleForm) {
+        muscleForm.addEventListener("submit", function() {
             document.getElementById("loading-overlay").style.display = "flex";
         });
     }
