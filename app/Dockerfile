@@ -1,5 +1,13 @@
 FROM python:3.13
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    mafft \
+    muscle \
+    wget \
+    tar \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN apt-get update && apt-get install -y wget tar \
     && rm -rf /var/lib/apt/lists/*
 
