@@ -211,8 +211,8 @@ def align_muscle():
 
     muscle_exe = "muscle"
 
-    if not os.path.exists(muscle_exe):
-        return render_template("index.html", error="MUSCLE binary not found. Ensure the Linux version is in the app folder.", active_tab=active_tab)
+    # if not os.path.exists(muscle_exe):
+    #     return render_template("index.html", error="MUSCLE binary not found. Ensure the Linux version is in the app folder.", active_tab=active_tab)
 
     try:
         fasta_text = file.read()
