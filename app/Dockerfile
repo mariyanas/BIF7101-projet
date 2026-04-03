@@ -1,20 +1,19 @@
 FROM python:3.13
 
-RUN apt-get update && apt-get install -y wget tar \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN wget https://github.com/iqtree/iqtree3/releases/download/v3.1.1/iqtree-3.1.1-Linux.tar.gz \
-    && tar -xvzf iqtree-3.1.1-Linux.tar.gz \
-    && mv iqtree-3.1.1-Linux/bin/iqtree3 /usr/local/bin/ \
-    && chmod +x /usr/local/bin/iqtree3
-
 WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY . .
 
+RUN apt-get update && apt-get install -y wget unzip
+
+RUN wget https://github.com/iqtree/iqtree2/releases/download/v2.3.16/IQ-TREE-2.3.16-Linux.tar.gz \
+    && tar -xvzf IQ-TREE-2.3.16-Linux.tar.gz \
+    && mv iqtree-2.3.16-Linux/bin/iqtree3 /usr/local/bin/ \
+    && rm -rf iqtree-2.3.16-Linux IQ-TREE-2.3.16-Linux.tar.gz
+
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 8080
 ENV PORT=8080
 
-CMD gunicorn main:app -b 0.0.0.0:$PORT -w 2
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "main:app"]
