@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y wget tar \
 
 RUN wget https://github.com/iqtree/iqtree3/releases/download/v3.1.1/iqtree-3.1.1-Linux.tar.gz \
     && tar -xvzf iqtree-3.1.1-Linux.tar.gz \
-    && mv iqtree-3.1.1-Linux/bin/iqtree3 /usr/local/bin/ \
+    && mv iqtree-3.1.1-Linux/bin/* /usr/local/bin/ \
     && chmod +x /usr/local/bin/iqtree3
 
 WORKDIR /app
