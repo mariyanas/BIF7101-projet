@@ -1,16 +1,16 @@
-from flask import Flask, render_template, request, Response, url_for, request, render_template, send_file, send_from_directory
+from flask import Flask, render_template, request, Response, url_for, render_template, send_file, send_from_directory
 from Bio import Phylo, AlignIO
 from io import StringIO
 from werkzeug.utils import secure_filename
 from Bio.Phylo.TreeConstruction import DistanceMatrix, DistanceTreeConstructor
 
+import re
+import subprocess, time, threading
+import tempfile
+import os
 import matplotlib
 import matplotlib.pyplot as plt
-import subprocess, time, threading, os
-import os
-import subprocess
 import uuid
-
 matplotlib.use("Agg")
 
 app = Flask(__name__)
@@ -22,7 +22,39 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
-# TOOL: Newick Tree Viewer
+# TOOL: newick_tree_viewer
+'''
+@app.route("/", methods=["GET", "POST"])
+def tree_viewer():
+    tree_image = None
+    error = None
+    active_tab = request.form.get("active_tab") or request.args.get("tab") or "main-page"
+
+    if request.method == "POST":
+        newick_str = request.form.get("newick")
+        active_tab = "newick_tree_viewer"  # keep tab active
+
+        if not newick_str or newick_str.strip() == "":
+            error = "Please provide a Newick string."
+        else:
+            try:
+                handle = StringIO(newick_str)
+                tree = Phylo.read(handle, "newick")
+
+                plt.figure(figsize=(8, 6))
+                Phylo.draw(tree, do_show=False)
+
+                image_path = "static/tree.png"
+                plt.savefig(image_path, bbox_inches="tight")
+                plt.close()
+
+                tree_image = url_for("static", filename="tree.png")
+
+            except Exception as e:
+                error = f"Failed to generate tree: {str(e)}"
+
+    return render_template("index.html", tree_image=tree_image, error=error, active_tab=active_tab)
+'''
 @app.route("/", methods=["GET", "POST"])
 def tree_viewer():
     tree_image = None
@@ -58,8 +90,51 @@ def tree_viewer():
                 tree_error = f"Failed to generate tree: {str(e)}"
 
     return render_template("index.html", tree_image=tree_image, tree_error=tree_error, active_tab=active_tab)
+    
+# TOOL: conversion
+'''
+@app.route("/convert", methods=["POST"])
+def convert():
+    file = request.files.get("fasta_file")
+    molecule_type = request.form.get("molecule_type")
 
-# TOOL: Conversion
+    if not file or file.filename == "":
+        return render_template("index.html", error="Please upload a FASTA file.")
+
+    if not molecule_type:
+        return render_template("index.html", error="Please select a molecule type.")
+
+    try:
+        fasta_text = file.read().decode("utf-8")
+
+        fasta_io = StringIO(fasta_text)
+        alignment = AlignIO.read(fasta_io, "fasta")
+
+        for record in alignment:
+            record.annotations["molecule_type"] = molecule_type
+
+        nexus_io = StringIO()
+        AlignIO.write(alignment, nexus_io, "nexus")
+
+        result = nexus_io.getvalue()
+        
+        fasta_filename = file.filename.rsplit('.', 1)[0]
+        nexus_filename = f"{fasta_filename}.nex"
+
+        return Response(
+            result,
+            mimetype="text/plain",
+            headers={
+                "Content-Disposition": f"attachment; filename={nexus_filename}"
+            }
+        )
+        
+    except Exception as e:
+        return render_template(
+            "index.html",
+            error=f"Conversion failed: {str(e)}"
+        )
+'''
 @app.route("/convert", methods=["POST"])
 def convert():
     file = request.files.get("fasta_file")
@@ -121,6 +196,247 @@ def parse_iqtree_distance_matrix(file_path):
     
     return DistanceMatrix(names, matrix)
 
+# TOOL: MUSCLE 
+@app.route("/align_muscle", methods=["POST"])
+def align_muscle():
+    file = request.files.get("fasta_file")
+    mode = request.form.get("computation_mode", "align")
+    active_tab = "muscle"
+
+    if not file or file.filename == "":
+        return render_template("index.html", error="Please upload a FASTA file.", active_tab=active_tab)
+
+    # Path to the Linux binary in your app/ folder
+    muscle_exe = os.path.join(os.getcwd(), "muscle")
+
+    if not os.path.exists(muscle_exe):
+        return render_template("index.html", error="MUSCLE binary not found. Ensure the Linux version is in the app folder.", active_tab=active_tab)
+
+    try:
+        fasta_text = file.read()
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".fasta") as temp_in:
+            temp_in.write(fasta_text)
+            temp_in_path = temp_in.name
+
+        temp_out_path = temp_in_path + "_aligned.fasta"
+
+        # MUSCLE v5 Linux Syntax
+        cmd = [muscle_exe, f"-{mode}", temp_in_path, "-output", temp_out_path]
+
+        process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+        if process.returncode != 0:
+            raise Exception(f"MUSCLE Error: {process.stderr}")
+
+        with open(temp_out_path, "r") as f:
+            aligned_result = f.read()
+
+        # Cleanup
+        os.remove(temp_in_path)
+        if os.path.exists(temp_out_path):
+            os.remove(temp_out_path)
+
+        original_name = file.filename.rsplit('.', 1)[0]
+        return Response(
+            aligned_result,
+            mimetype="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={original_name}_aligned.fasta"}
+        )
+
+    except Exception as e:
+        if 'temp_in_path' in locals() and os.path.exists(temp_in_path): os.remove(temp_in_path)
+        if 'temp_out_path' in locals() and os.path.exists(temp_out_path): os.remove(temp_out_path)
+        return render_template("index.html", error=str(e), active_tab=active_tab)
+    
+# TOOL: MAFFT
+@app.route("/align_mafft", methods=["POST"])
+def align_mafft():
+    file = request.files.get("fasta_file")
+    # Capture the new strategy from the form
+    strategy = request.form.get("mafft_strategy", "--auto")
+    active_tab = "mafft"
+
+    if not file or file.filename == "":
+        return render_template("index.html", error="Please upload a FASTA file.", active_tab=active_tab)
+
+    # Path to the MAFFT binary in your /app folder
+    # mafft_exe = os.path.join(os.getcwd(), "mafft")
+    mafft_exe = "mafft"
+    
+    try:
+        fasta_content = file.read()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".fasta") as temp_in:
+            temp_in.write(fasta_content)
+            temp_in_path = temp_in.name
+        
+        temp_out_path = temp_in_path + "_mafft_aligned.fasta"
+
+        # Building command with the selected strategy
+        # cmd = ["mafft", "--auto", temp_in_path]
+        cmd = [mafft_exe, strategy, temp_in_path]
+        with open(temp_out_path, "w") as out_file:
+            process = subprocess.run(cmd, 
+                                     stdout=out_file, 
+                                     stderr=subprocess.PIPE, 
+                                     text=True)
+
+        if process.returncode != 0:
+            raise Exception(f"MAFFT Error: {process.stderr}")
+
+        with open(temp_out_path, "r") as f:
+            aligned_result = f.read()
+
+        # Cleanup temporary files
+        os.remove(temp_in_path)
+        if os.path.exists(temp_out_path):
+            os.remove(temp_out_path)
+
+        original_name = file.filename.rsplit('.', 1)[0]
+        return Response(
+            aligned_result,
+            mimetype="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={original_name}_mafft.fasta"}
+        )
+
+    except Exception as e:
+        return render_template("index.html", error=str(e), active_tab=active_tab)
+
+# TOOL: Clustal Omega 
+@app.route("/align_clustalo", methods=["POST"])
+def align_clustalo():
+    file = request.files.get("fasta_file")
+    active_tab = "clustalo"
+
+    if not file or file.filename == "":
+        return render_template("index.html", error="Please upload a FASTA file.", active_tab=active_tab)
+
+    try:
+        fasta_content = file.read()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".fasta") as temp_in:
+            temp_in.write(fasta_content)
+            temp_in_path = temp_in.name
+        
+        temp_out_path = temp_in_path + "_clustalo_aligned.fasta"
+
+        # Clustal Omega Command
+        # -i: input, -o: output, --auto: set options automatically, --force: overwrite
+        cmd = ["clustalo", "-i", temp_in_path, "-o", temp_out_path, "--auto", "--force"]
+        
+        process = subprocess.run(cmd, capture_output=True, text=True)
+
+        if process.returncode != 0:
+            raise Exception(f"Clustal Omega Error: {process.stderr}")
+
+        with open(temp_out_path, "r") as f:
+            aligned_result = f.read()
+
+        # Cleanup
+        os.remove(temp_in_path)
+        if os.path.exists(temp_out_path):
+            os.remove(temp_out_path)
+
+        original_name = file.filename.rsplit('.', 1)[0]
+        return Response(
+            aligned_result,
+            mimetype="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={original_name}_clustalo.fasta"}
+        )
+
+    except Exception as e:
+        return render_template("index.html", error=str(e), active_tab=active_tab)
+
+# TOOL: MPBoot
+@app.route("/run_mpboot", methods=["POST"])
+def run_mpboot():
+    file = request.files.get("fasta_file")
+    active_tab = "parsimony"
+
+    if not file or file.filename == "":
+        return render_template("index.html", error="Please upload a FASTA file.", active_tab=active_tab)
+
+    mpboot_exe = os.path.join(os.getcwd(), "mpboot")
+
+    try:
+        fasta_text = file.read()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".fasta") as temp_in:
+            temp_in.write(fasta_text)
+            temp_in_path = temp_in.name
+        
+        output_prefix = temp_in_path + "_mpb"
+
+        # -s: input, -bb: 1000 bootstrap replicates, -pre: output prefix
+        cmd = [mpboot_exe, "-s", temp_in_path, "-bb", "1000", "-pre", output_prefix]
+        process = subprocess.run(cmd, capture_output=True, text=True)
+
+        if process.returncode != 0:
+            raise Exception(f"MPBoot Error: {process.stderr}")
+
+        treefile_path = output_prefix + ".treefile"
+        with open(treefile_path, "r") as f:
+            tree_data = f.read()
+
+        # Cleanup intermediate files
+        for ext in [".log", ".treefile", ".iqtree", ".ckp.gz"]:
+            if os.path.exists(output_prefix + ext):
+                os.remove(output_prefix + ext)
+        os.remove(temp_in_path)
+
+        return Response(
+            tree_data,
+            mimetype="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={file.filename}_mpboot.tree"}
+        )
+
+    except Exception as e:
+        return render_template("index.html", error=str(e), active_tab=active_tab)
+    
+# TOOL: IQ-TREE
+@app.route("/run_iqtree", methods=["POST"])
+def run_iqtree():
+    file = request.files.get("alignment_file")
+    active_tab = "ml" # Maximum Likelihood tab
+
+    if not file or file.filename == "":
+        return render_template("index.html", error="Please upload an alignment file.", active_tab=active_tab)
+
+    iqtree_exe = os.path.join(os.getcwd(), "iqtree")
+
+    try:
+        content = file.read()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".fasta") as temp_in:
+            temp_in.write(content)
+            temp_in_path = temp_in.name
+        
+        output_prefix = temp_in_path + "_iq"
+
+        # -s: input, -m MFP: ModelFinder Plus (finds best substitution model)
+        # -bb: 1000 ultrafast bootstraps, -nt AUTO: use optimal threads
+        cmd = [iqtree_exe, "-s", temp_in_path, "-m", "MFP", "-bb", "1000", "-nt", "AUTO", "-pre", output_prefix]
+        
+        process = subprocess.run(cmd, capture_output=True, text=True)
+
+        if process.returncode != 0:
+            raise Exception(f"IQ-TREE Error: {process.stderr}")
+
+        # The ML tree with bootstrap supports is in the .treefile
+        treefile_path = output_prefix + ".treefile"
+        with open(treefile_path, "r") as f:
+            tree_data = f.read()
+
+        # Cleanup (IQ-TREE generates MANY files)
+        extensions = [".log", ".treefile", ".iqtree", ".ckp.gz", ".bionj", ".mldist", ".model.gz", ".splits.nex"]
+        for ext in extensions:
+            if os.path.exists(output_prefix + ext):
+                os.remove(output_prefix + ext)
+        os.remove(temp_in_path)
+
+        # Return as JSON so your new visualizer can print it on screen
+        return jsonify({"newick": tree_data, "method": "Maximum Likelihood"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
 # TOOL: Distance (Neighbour-Joining and UPGMA)
 @app.route("/distance-methods", methods=["POST"])
 def NJ():
