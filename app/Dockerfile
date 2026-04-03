@@ -17,4 +17,4 @@ COPY . .
 
 ENV PORT=8080
 
-CMD gunicorn main:app -b 0.0.0.0:$PORT -w 2
+CMD gunicorn main:app -b 0.0.0.0:$PORT -w 2 --timeout 300
