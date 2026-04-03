@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN wget https://github.com \
-    && chmod +x muscle-linux-x86.v5.3 \
-    && ./muscle-linux-x86.v5.3
+# RUN wget https://github.com \
+#     && chmod +x muscle-linux-x86.v5.3 \
+#     && ./muscle-linux-x86.v5.3
 
 RUN wget https://github.com/iqtree/iqtree3/releases/download/v3.1.1/iqtree-3.1.1-Linux.tar.gz \
     && tar -xvzf iqtree-3.1.1-Linux.tar.gz \
