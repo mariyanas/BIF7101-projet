@@ -207,9 +207,9 @@ def align_muscle():
         return render_template("index.html", error="Please upload a FASTA file.", active_tab=active_tab)
 
     # Path to the Linux binary in your app/ folder
-    muscle_exe = os.path.join(os.getcwd(), "muscle")
+    # muscle_exe = os.path.join(os.getcwd(), "muscle")
 
-    print(muscle_exe)
+    muscle_exe = "muscle"
 
     if not os.path.exists(muscle_exe):
         return render_template("index.html", error="MUSCLE binary not found. Ensure the Linux version is in the app folder.", active_tab=active_tab)
