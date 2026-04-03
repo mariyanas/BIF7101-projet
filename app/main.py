@@ -155,6 +155,14 @@ def NJ():
         ]     
         # print("Running command:", " ".join(cmd))
 
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            print("IQ-TREE output:", result.stdout)
+        except subprocess.CalledProcessError as e:
+            print("IQ-TREE failed with return code:", e.returncode)
+            print("STDOUT:", e.stdout)
+            print("STDERR:", e.stderr)
+
         result = subprocess.run(
             cmd,
             capture_output=True,
