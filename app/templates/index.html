@@ -168,6 +168,55 @@
             <!-- sequence alignment/CLUSTALO -->
             <div id="clustalo" class="tool">
                 <h2>Sequence Alignment (Clustal Omega)</h2>
+                <form id="clustalo-form" method="POST" action="/align_clustalo" enctype="multipart/form-data">
+                    <input type="hidden" name="active_tab" value="clustalo">
+                    <h4>Upload Sequences (FASTA format):</h4>
+                    <input type="file" name="fasta_file" required>
+                    <br><br>
+                    
+                    <div class="options-group">
+                        <label>Output Format:</label>
+                        <select name="outfmt" style="padding: 5px;">
+                            <option value="fasta">FASTA (Default)</option>
+                            <option value="clustal">Clustal (.aln)</option>
+                            <option value="phylip">PHYLIP (.phy)</option>
+                        </select>
+                    </div>
+                    <br>
+
+                    <div class="options-group">
+                        <label>HMM Iterations (Refinement):</label>
+                        <select name="iterations" style="padding: 5px;">
+                            <option value="0">0 - Fast (Default)</option>
+                            <option value="1">1 - More accurate</option>
+                            <option value="2">2 - Highly accurate (Slower)</option>
+                        </select>
+                    </div>
+                    <br>
+
+                    <div class="options-group">
+                        <label>Output Order:</label>
+                        <select name="outorder" style="padding: 5px;">
+                            <option value="input-order">Input Order (Default)</option>
+                            <option value="tree-order">Aligned Tree Order</option>
+                        </select>
+                    </div>
+                    <br><br>
+
+                    <p style="font-size: 14px; color: #666;">
+                        Clustal Omega uses seeded guide trees and HMM profile-profile techniques to provide high-scale alignments.
+                    </p>
+                    <button type="submit">Run Clustal Omega</button>
+                </form>
+
+                {% if error and active_tab == 'clustalo' %}
+                    <p style="color:red;">{{ error }}</p>
+                {% endif %}
+            </div>
+            
+            <!--
+            <div id="clustalo" class="tool">
+                <h2>Sequence Alignment (Clustal Omega)</h2>
                 <form method="POST" action="/align_clustalo" enctype="multipart/form-data">
                     <input type="hidden" name="active_tab" value="clustalo">
                     <h4>Upload Sequences (FASTA format):</h4>
@@ -178,15 +227,6 @@
                     </p>
                     <button type="submit">Run Clustal Omega</button>
                 </form>
-            </div>
-
-            <!--
-            <div id="sequence_alignment" class="tool">
-                <h2>Sequence Alignment using MUSCLE</h2>
-                <h4>Enter your FASTA format sequences.</h4>
-
-                <h2>Sequence Alignment using MAFFT</h2>
-                <h4>Enter your FASTA format sequences.</h4>
             </div>
             -->
 
