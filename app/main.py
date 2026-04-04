@@ -317,6 +317,66 @@ def align_mafft():
         return render_template("index.html", error=str(e), active_tab=active_tab)
 
 # TOOL: Clustal Omega 
+# TOOL: Clustal Omega 
+@app.route("/align_clustalo", methods=["POST"])
+def align_clustalo():
+    file = request.files.get("fasta_file")
+    active_tab = "clustalo"
+
+    # Capture options from the form
+    outfmt = request.form.get("outfmt", "fasta")
+    iterations = request.form.get("iterations", "0")
+    outorder = request.form.get("outorder", "input-order")
+
+    if not file or file.filename == "":
+        return render_template("index.html", error="Please upload a FASTA file.", active_tab=active_tab)
+
+    try:
+        fasta_content = file.read()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".fasta") as temp_in:
+            temp_in.write(fasta_content)
+            temp_in_path = temp_in.name
+        
+        temp_out_path = temp_in_path + "_clustalo_aligned.txt"
+
+        # Build the Clustal Omega Command dynamically
+        cmd = [
+            "clustalo", 
+            "-i", temp_in_path, 
+            "-o", temp_out_path, 
+            "--outfmt", outfmt,
+            "--iter", iterations,
+            "--output-order", outorder,
+            "--force"
+        ]
+        
+        process = subprocess.run(cmd, capture_output=True, text=True)
+
+        if process.returncode != 0:
+            raise Exception(f"Clustal Omega Error: {process.stderr}")
+
+        with open(temp_out_path, "r") as f:
+            aligned_result = f.read()
+
+        # Cleanup
+        os.remove(temp_in_path)
+        if os.path.exists(temp_out_path):
+            os.remove(temp_out_path)
+
+        # Match the downloaded file extension to the requested format
+        ext_map = {"fasta": "fasta", "clustal": "aln", "phylip": "phy"}
+        file_extension = ext_map.get(outfmt, "txt")
+        original_name = file.filename.rsplit('.', 1)[0]
+        
+        return Response(
+            aligned_result,
+            mimetype="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={original_name}_clustalo.{file_extension}"}
+        )
+
+    except Exception as e:
+        return render_template("index.html", error=str(e), active_tab=active_tab)
+'''
 @app.route("/align_clustalo", methods=["POST"])
 def align_clustalo():
     file = request.files.get("fasta_file")
@@ -359,6 +419,7 @@ def align_clustalo():
 
     except Exception as e:
         return render_template("index.html", error=str(e), active_tab=active_tab)
+'''
 
 # TOOL: MPBoot
 @app.route("/run_mpboot", methods=["POST"])
