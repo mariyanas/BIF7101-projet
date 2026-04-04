@@ -309,25 +309,33 @@ def align_mafft():
         if process.returncode != 0:
             raise Exception(f"MAFFT Error: {process.stderr}")
 
-        with open(temp_out_path, "r") as f:
-            aligned_result = f.read()
+        #with open(temp_out_path, "r") as f:
+        #    aligned_result = f.read()
+
+        safe_original_name = secure_filename(file.filename).rsplit('.', 1)[0]
+        download_name = f"{safe_original_name}_mafft_{uuid.uuid4().hex[:6]}.fasta"
+        download_path = os.path.join(UPLOAD_FOLDER, download_name)
+
+        shutil.move(temp_out_path, download_path)
+        mafft_download_file = url_for("uploaded_file", filename=download_name)
 
         # Cleanup temporary files
         os.remove(temp_in_path)
         if os.path.exists(temp_out_path):
             os.remove(temp_out_path)
-
+        '''
         original_name = file.filename.rsplit('.', 1)[0]
         return Response(
             aligned_result,
             mimetype="text/plain",
             headers={"Content-Disposition": f"attachment; filename={original_name}_mafft.fasta"}
         )
+        '''
+        return render_template("index.html", active_tab=active_tab, mafft_download_file=mafft_download_file)
 
     except Exception as e:
         return render_template("index.html", error=str(e), active_tab=active_tab)
-
-# TOOL: Clustal Omega 
+ 
 # TOOL: Clustal Omega 
 @app.route("/align_clustalo", methods=["POST"])
 def align_clustalo():
@@ -366,14 +374,26 @@ def align_clustalo():
         if process.returncode != 0:
             raise Exception(f"Clustal Omega Error: {process.stderr}")
 
-        with open(temp_out_path, "r") as f:
-            aligned_result = f.read()
+        # Match the downloaded file extension to the requested format
+        ext_map = {"fasta": "fasta", "clustal": "aln", "phylip": "phy"}
+        file_extension = ext_map.get(outfmt, "txt")
+        
+        # Move the aligned file to the uploads folder
+        safe_original_name = secure_filename(file.filename).rsplit('.', 1)[0]
+        download_name = f"{safe_original_name}_clustalo_{uuid.uuid4().hex[:6]}.{file_extension}"
+        download_path = os.path.join(UPLOAD_FOLDER, download_name)
+
+        shutil.move(temp_out_path, download_path)
+        clustalo_download_file = url_for("uploaded_file", filename=download_name)
+
+        #with open(temp_out_path, "r") as f:
+        #    aligned_result = f.read()
 
         # Cleanup
         os.remove(temp_in_path)
         if os.path.exists(temp_out_path):
             os.remove(temp_out_path)
-
+        '''
         # Match the downloaded file extension to the requested format
         ext_map = {"fasta": "fasta", "clustal": "aln", "phylip": "phy"}
         file_extension = ext_map.get(outfmt, "txt")
@@ -384,7 +404,9 @@ def align_clustalo():
             mimetype="text/plain",
             headers={"Content-Disposition": f"attachment; filename={original_name}_clustalo.{file_extension}"}
         )
-
+        '''
+        return render_template("index.html", active_tab=active_tab, clustalo_download_file=clustalo_download_file)
+        
     except Exception as e:
         return render_template("index.html", error=str(e), active_tab=active_tab)
 '''
