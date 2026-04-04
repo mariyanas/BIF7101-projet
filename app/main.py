@@ -264,7 +264,6 @@ def align_mafft():
 
     # Path to the MAFFT binary in your /app folder
     # mafft_exe = os.path.join(os.getcwd(), "mafft")
-    mafft_exe = "mafft"
     
     try:
         fasta_content = file.read()
@@ -274,9 +273,19 @@ def align_mafft():
         
         temp_out_path = temp_in_path + "_mafft_aligned.fasta"
 
+        if strategy == "--linsi":
+            cmd = ["mafft-linsi", temp_in_path]
+        elif strategy == "--einsi":
+            cmd = ["mafft-einsi", temp_in_path]
+        elif strategy == "--ginsi":
+            cmd = ["mafft-ginsi", temp_in_path]
+        else:
+            # Fallback to standard auto mode
+            cmd = ["mafft", "--auto", temp_in_path]
+
         # Building command with the selected strategy
         # cmd = ["mafft", "--auto", temp_in_path]
-        cmd = [mafft_exe, strategy, temp_in_path]
+        
         with open(temp_out_path, "w") as out_file:
             process = subprocess.run(cmd, 
                                      stdout=out_file, 
