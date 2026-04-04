@@ -145,7 +145,7 @@
             <!-- sequence alignment/MAFFT -->
             <div id="mafft" class="tool">
                 <h2>Sequence Alignment using MAFFT</h2>
-                <form method="POST" action="/align_mafft" enctype="multipart/form-data">
+                <form id="mafft-form" method="POST" action="/align_mafft" enctype="multipart/form-data">
                     <input type="hidden" name="active_tab" value="mafft">
                     <h4>Enter your FASTA format sequences.</h4>
                     <input type="file" name="fasta_file" required>
@@ -436,6 +436,20 @@ window.onload = function() {
     var distanceForm = document.querySelector("#distance-form");
     if (distanceForm) {
         distanceForm.addEventListener("submit", function() {
+            document.getElementById("loading-overlay").style.display = "flex";
+        });
+    }
+
+    var mafftForm = document.querySelector("#mafft-form");
+    if (mafftForm) {
+        mafftForm.addEventListener("submit", function() {
+            document.getElementById("loading-overlay").style.display = "flex";
+        });
+    }
+
+    var clustaloForm = document.querySelector("#clustalo-form");
+    if (clustaloForm) {
+        clustaloForm.addEventListener("submit", function() {
             document.getElementById("loading-overlay").style.display = "flex";
         });
     }
