@@ -165,6 +165,23 @@ button[type="submit"]:hover {
     background: #431963;
 }
 
+button {
+    background: #5a2285;
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    margin-top: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: #431963;
+}
+
 hr {
     border: none; 
     height: 1px; 
