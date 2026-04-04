@@ -274,11 +274,14 @@ def align_mafft():
         temp_out_path = temp_in_path + "_mafft_aligned.fasta"
 
         if strategy == "--linsi":
-            cmd = ["mafft-linsi", temp_in_path]
+            # L-INS-i: Local pair alignment (most accurate)
+            cmd = ["mafft", "--localpair", "--maxiterate", "1000", temp_in_path]
         elif strategy == "--einsi":
-            cmd = ["mafft-einsi", temp_in_path]
+            # E-INS-i: Generalized affine gap costs
+            cmd = ["mafft", "--genafpair", "--ep", "0", "--maxiterate", "1000", temp_in_path]
         elif strategy == "--ginsi":
-            cmd = ["mafft-ginsi", temp_in_path]
+            # G-INS-i: Global pair alignment
+            cmd = ["mafft", "--globalpair", "--maxiterate", "1000", temp_in_path]
         else:
             # Fallback to standard auto mode
             cmd = ["mafft", "--auto", temp_in_path]
