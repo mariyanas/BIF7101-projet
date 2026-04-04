@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y wget tar \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     mafft \
-#    muscle \
+    clustalo \
     wget \
     tar \
     ca-certificates \
