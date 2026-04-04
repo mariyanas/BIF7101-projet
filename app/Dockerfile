@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y wget tar \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     mafft \
-    muscle \
+#    muscle \
     wget \
     tar \
     ca-certificates \
@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #     && ./muscle-linux-x86.v5.3
 
 # Download MUSCLE v5.3 (Linux x86_64)
-# RUN wget https://github.com/rcedgar/muscle/releases/download/5.3/muscle5.3_linux64 -O /usr/local/bin/muscle \
-#     && chmod +x /usr/local/bin/muscle
+RUN wget https://github.com/rcedgar/muscle/releases/download/v5.3/muscle-linux-x86.v5.3 -O /usr/local/bin/muscle \
+    && chmod +x /usr/local/bin/muscle
 
 RUN wget https://github.com/iqtree/iqtree3/releases/download/v3.1.1/iqtree-3.1.1-Linux.tar.gz \
     && tar -xvzf iqtree-3.1.1-Linux.tar.gz \
