@@ -11,6 +11,7 @@ import os
 import matplotlib
 import matplotlib.pyplot as plt
 import uuid
+import shutil
 matplotlib.use("Agg")
 
 app = Flask(__name__)
@@ -230,21 +231,31 @@ def align_muscle():
 
         if process.returncode != 0:
             raise Exception(f"MUSCLE Error: {process.stderr}")
-
+        '''
         with open(temp_out_path, "r") as f:
             aligned_result = f.read()
+        '''
+        # Move the aligned file to the uploads folder
+        safe_original_name = secure_filename(file.filename).rsplit('.', 1)[0]
+        download_name = f"{safe_original_name}_muscle_{uuid.uuid4().hex[:6]}.fasta"
+        download_path = os.path.join(UPLOAD_FOLDER, download_name)
 
+        shutil.move(temp_out_path, download_path)
+        muscle_download_file = url_for("uploaded_file", filename=download_name)
+        
         # Cleanup
         os.remove(temp_in_path)
         if os.path.exists(temp_out_path):
             os.remove(temp_out_path)
-
+        '''
         original_name = file.filename.rsplit('.', 1)[0]
         return Response(
             aligned_result,
             mimetype="text/plain",
             headers={"Content-Disposition": f"attachment; filename={original_name}_aligned.fasta"}
         )
+        '''
+        return render_template("index.html", active_tab=active_tab, muscle_download_file=muscle_download_file)
 
     except Exception as e:
         if 'temp_in_path' in locals() and os.path.exists(temp_in_path): os.remove(temp_in_path)
