@@ -33,7 +33,7 @@ body {
 /* HOVER */
 .topnav button:hover, .dropdown:hover .dropbtn {
     /* font-size: 18px; */
-    background: linear-gradient(160deg, #5a67d8, #7957d8, #5a67d8);
+    background: linear-gradient(160deg, #5a2285, #431963, #5a2285);
     color: white;
     transform: translateY(-1px);
 }
@@ -41,7 +41,7 @@ body {
 /*  ACTIVE  */
 .topnav button.active {
     /* font-size: 18px; */
-    background: linear-gradient(160deg, #5a67d8, #7957d8, #5a67d8);
+    background: linear-gradient(160deg, #5a2285, #431963, #5a2285);
     color: white;
 }
 
@@ -78,7 +78,7 @@ body {
 
 /*  DROPDOWN ITEM HOVER  */
 .dropdown-content button:hover {
-    background: linear-gradient(160deg, #5a67d8, #7957d8, #5a67d8);
+    background: linear-gradient(160deg, #5a2285, #431963, #5a2285);
     padding-left: 20px;
 }
 
@@ -126,8 +126,13 @@ h1 {
 
 h2 {
     margin-top: 0;
-    border-left: 5px solid #EE316B;
+    border-left: 5px solid #431963;
     padding-left: 10px;
+}
+
+#instructions {
+    font-size: 18px;  
+    font-weight: bold;
 }
 
 
@@ -137,14 +142,14 @@ input[type="number"] {
     width: 98.5%;
     padding: 10px;
     margin-top: 8px;
-    border-radius: 6px;
+    border-radius: 5px;
     border: 1px solid #cbd5e0;
     font-size: 14px;
 }
 
 
 button[type="submit"] {
-    background: #5a67d8;
+    background: #5a2285;
     border: none;
     color: white;
     padding: 10px 18px;
@@ -152,11 +157,12 @@ button[type="submit"] {
     border-radius: 6px;
     cursor: pointer;
     transition: 0.2s;
+    font-size: 14px;
 }
 
 button[type="submit"]:hover {
     transform: scale(1.05);
-    background: #434190;
+    background: #431963;
 }
 
 hr {
