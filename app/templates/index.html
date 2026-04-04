@@ -78,15 +78,16 @@
                 <h2>Newick Tree Viewer</h2>
 
                 <form method="POST" action="/">
-                    <h4>Enter a Newick string to generate a visualization.</h4>
+                    <p id="instructions"> Enter a Newick string to generate a visualization.</p>
                     <input type="hidden" name="active_tab" value="newick_tree_viewer">
                     <!--{{ request.form.get("newick", "") }}-->
                     <textarea name="newick" cols="50" rows="5" style="resize:vertical;" placeholder="ex. (3:1.4169,(2:0.7175,4:0.4890):0.5861,(1:2.2016,5:0.7767):0.8123);"></textarea>
-                    <h4>Width (inches)</h4>
+                    <p id="instructions"> Width (inches)</p>
                     <input type="number" step="0.2" name="width" placeholder="6.4" style="width: 10%;">
-                    <h4>Height (inches)</h4>
+                    <br><br>
+                    <p id="instructions"> Height (inches)</p>
                     <input type="number" step="0.2" name="height" placeholder="4.8" style="width: 10%;">
-                    <br>
+                    <br><br>
                     <button type="submit">Submit</button>
                 </form>
 
@@ -103,7 +104,7 @@
                     <p style="font-size: 12px;">
                         Eric Talevich, Brandon M. Invergo, Peter J.A. Cock, Brad A. Chapman: Bio.Phylo: A unified toolkit 
                         for processing, analyzing and visualizing phylogenetic trees in Biopython. BMC Bioinformatics 13: 
-                        209 (2012). https://doi.org/10.1186/1471-2105-13-209
+                        209 (2012).
                         <a href="https://doi.org/10.1186/1471-2105-13-209">https://doi.org/10.1186/1471-2105-13-209</a>
                     </p>
                 </p>
@@ -115,11 +116,11 @@
                 <h2>Sequence Alignment using MUSCLE v5</h2>
                 <form id="muscle-form" method="POST" action="/align_muscle" enctype="multipart/form-data">
                     <input type="hidden" name="active_tab" value="muscle">
-                    <h4>Upload unaligned sequences (FASTA format):</h4>
+                    <p id="instructions"> Upload unaligned sequences (FASTA format):</p>
                     <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
                     <br><br>
-                    <h4>Computation Mode:</h4>
-                    <select name="computation_mode" style="padding: 5px;">
+                    <p id="instructions"> Computation Mode:</p>
+                    <select name="computation_mode" style="padding: 5px; font-size: 14px;">
                         <option value="align">Standard (-align): High accuracy</option>
                         <option value="super5">Super5 (-super5): Large datasets</option>
                     </select>
@@ -149,26 +150,26 @@
                     </span>
                 </p>
             </div>
-             
+    
 
             <!-- sequence alignment/MAFFT -->
             <div id="mafft" class="tool">
                 <h2>Sequence Alignment using MAFFT</h2>
                 <form id="mafft-form" method="POST" action="/align_mafft" enctype="multipart/form-data">
                     <input type="hidden" name="active_tab" value="mafft">
-                    <h4>Enter your FASTA format sequences.</h4>
-                    <input type="file" name="fasta_file" required>
+                    <p id="instructions"> Enter your FASTA format sequences.</p>
+                    <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
                     <br><br>
                     <div class="options-group">
-                        <label for="mafft_strategy">Alignment Strategy:</label>
-                        <select name="mafft_strategy" id="mafft_strategy">
+                        <p id="instructions"><label for="mafft_strategy">Alignment Strategy:</label><p>
+                        <select name="mafft_strategy" id="mafft_strategy" style="padding: 5px; font-size: 14px;">
                             <option value="--auto">Auto (Default speed/accuracy)</option>
                             <option value="--linsi">L-INS-i (Most accurate, max ~200 sequences)</option>
                             <option value="--einsi">E-INS-i (For sequences with large gaps)</option>
                             <option value="--ginsi">G-INS-i (For sequences of similar length)</option>
                         </select>
                     </div>
-                    <br><br>
+                    <!-- <br><br> -->
                     <!-- <p style="font-size: 14px; color: #666;">Mode: --auto (Automatically selects strategy based on data size)</p> -->
                     <button type="submit">Run MAFFT Alignment</button>
                 </form>
@@ -187,33 +188,38 @@
                 <h2>Sequence Alignment (Clustal Omega)</h2>
                 <form id="clustalo-form" method="POST" action="/align_clustalo" enctype="multipart/form-data">
                     <input type="hidden" name="active_tab" value="clustalo">
-                    <h4>Upload Sequences (FASTA format):</h4>
+                    <p id="instructions">Upload Sequences (FASTA format):</p>
                     <input type="file" name="fasta_file" required>
                     <br><br>
+
+                    <p id="instructions"> Parameters:</p>
                     
                     <div class="options-group">
                         <label>Output Format:</label>
-                        <select name="outfmt" style="padding: 5px;">
+                        <br><br>
+                        <select name="outfmt" style="padding: 5px; width: 15%; font-size: 14px;">
                             <option value="fasta">FASTA (Default)</option>
                             <option value="clustal">Clustal (.aln)</option>
                             <option value="phylip">PHYLIP (.phy)</option>
                         </select>
                     </div>
-                    <br>
+                    <br><br>
 
                     <div class="options-group">
                         <label>HMM Iterations (Refinement):</label>
-                        <select name="iterations" style="padding: 5px;">
+                        <br><br>
+                        <select name="iterations" style="padding: 5px; width: 15%; font-size: 14px;">
                             <option value="0">0 - Fast (Default)</option>
                             <option value="1">1 - More accurate</option>
                             <option value="2">2 - Highly accurate (Slower)</option>
                         </select>
                     </div>
-                    <br>
+                    <br><br>
 
                     <div class="options-group">
                         <label>Output Order:</label>
-                        <select name="outorder" style="padding: 5px;">
+                        <br><br>
+                        <select name="outorder" style="padding: 5px; width: 15%; font-size: 14px;">
                             <option value="input-order">Input Order (Default)</option>
                             <option value="tree-order">Aligned Tree Order</option>
                         </select>
@@ -260,9 +266,9 @@
             <div id="bayesian-inference" class="tool">
                 <h2>Bayesian Inference</h2>
                 <form id="bayesian-inference-form" method="POST" action="/bayesian_inference" enctype="multipart/form-data">
-                    <h4>Upload aligned sequences (FASTA or NEXUS):</h4>
+                    <p id="instructions">Upload aligned sequences (FASTA or NEXUS):</p>
                     <input type="file" name="sequence_file" accept=".fasta,.fa,.txt,.nex" required>
-                    <h4>Parameters (leave blank for defaults):</h4>
+                    <p id="instructions">Parameters (leave blank for defaults):</p>
                     <label>Number of Generations: <br><input type="number" name="ngen" placeholder="Default: 1000000" style="width: 10%;"></label><br><br>
                     <label>Sample Frequency: <br><input type="number" name="samplefreq" placeholder="Default: 100" style="width: 10%;"></label><br><br>
                     <label>Print Frequency: <br><input type="number" name="printfreq" placeholder="Default: 100000" style="width: 10%;"></label><br><br>
@@ -325,10 +331,10 @@
                 </form>
                 -->
                 <form id = "distance-form" method="post" action="/distance-methods" enctype="multipart/form-data">
-                    <h4>Upload aligned sequences (FASTA format)</h4>
+                    <p id="instructions">Upload aligned sequences (FASTA format)</p>
                     <input type="file" name="fasta_file_distance" accept=".fasta,.fa,.txt" required>
                     <br><br>
-                    <h4 for="method">Select method:</h4>
+                    <p id="instructions" for="method">Select method:</p>
                     <input type="radio" id="nj" name="method" value="nj" required>
                     <label for="nj">NJ (Neighbor-Joining)</label>
                     <input type="radio" id="upgma" name="method" value="upgma">
@@ -372,10 +378,10 @@
                 
                 <form method="POST" action="/run_mpboot" enctype="multipart/form-data">
                     <input type="hidden" name="active_tab" value="parsimony">
-                    <h4>Upload Aligned Sequences (FASTA):</h4>
+                    <p id="instructions">Upload Aligned Sequences (FASTA):</p>
                     <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
                     <br><br>
-                    <button type="submit" style="background-color: #4f46e5; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                    <button type="submit">
                         Generate Parsimony Tree
                     </button>
                 </form>
@@ -385,7 +391,7 @@
                 <h2>Parsimony</h2>
                 <p>Coming soon.</p>
             </div>
-             -->
+            -->
 
             <!-- Maximum Likelihood -->
             <div id="maximum-likelihood" class="tool">
@@ -393,7 +399,7 @@
                 <p>IQ-TREE uses ModelFinder to pick the best substitution model and builds an ML tree.</p>
                 
                 <form onsubmit="handleAnalysis(event, '/run_iqtree')">
-                    <h4>Upload Aligned Sequences (FASTA):</h4>
+                    <p id="instructions">Upload Aligned Sequences (FASTA):</p>
                     <input type="file" name="alignment_file" required>
                     <br><br>
                     <button type="submit">Run IQ-TREE</button>
@@ -411,10 +417,10 @@
             <div id="conversion" class="tool">
                 <h2>Convert a FASTA file to a NEXUS file</h2>
                 <form method="post" action="/convert" enctype="multipart/form-data">
-                    <h4>Upload FASTA file:</h4>
+                    <p id="instructions">Upload FASTA file:</p>
                     <input type="file" name="fasta_file" accept=".fasta,.fa,.txt" required>
 
-                    <h4>Select molecule type:</h4>
+                    <p id="instructions">Select molecule type:</p>
                     <label>
                         <input type="radio" name="molecule_type" value="DNA" required> DNA
                     </label>
